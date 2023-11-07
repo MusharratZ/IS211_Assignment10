@@ -1,3 +1,69 @@
+import sqlite3
+
+
+def query_pets():
+    # connect to pets db.
+    conn = sqlite3.connect("pets.db")
+    # create a cursor to the pets db
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT
+            p.id,
+            p.first_name,
+            p.last_name,
+            p.age,
+            pt.name AS pet_name,
+            pt.breed AS pet_breed,
+            pt.age AS pet_age
+        FROM person AS p
+        JOIN person_pet AS pp ON p.id = pp.person_id
+        JOIN pet AS pt ON pp.pet_id = pt.id;
+        """
+    )
+    person_pet = cursor.fetchall()
+    # close db connection
+    conn.close()
+    # check if data was retrieved
+    if person_pet:
+        # while loop executes till the user enters -1
+        while True:
+            # read input
+            inp = input("Enter person’s ID number: ")
+
+            # verify user input
+            user_input = -1
+            try:
+                user_input = int(inp)
+            except:
+                print("Input must be a number!\n")
+                continue
+            # if user enters -1, terminate
+            if user_input == -1:
+                break
+
+            else:
+                # boolean to check if id exists
+                exists = False
+
+                for entry in person_pet:
+                    # print user details if found
+                    if entry[0] == user_input:
+                        print(f"{entry[1]} {entry[2]} {entry[3]} years old.\n")
+                        # user exists, update to true
+                        exists = True
+                        break
+                if not exists:
+                    print("The is no user with the entered id!\n")
+                # print users pets
+                for entry in person_pet:
+                    if entry[0] == user_input:
+                        print(f"{entry[1]} {entry[2]} owned {entry[4]}, a {entry[5]}, that was {entry[6]} years old")
+                print()
+
+    else:
+        print("The database is empty, run the initialization script first.")
+
 
 if __name__ == "__main__":
-    pass
+    query_pets()

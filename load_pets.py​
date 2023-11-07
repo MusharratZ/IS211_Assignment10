@@ -1,3 +1,84 @@
+import sqlite3
+
+
+# Function to create the pets database
+def create_pets_db():
+    # create to pets db if it does not exist and connect to it.
+    conn = sqlite3.connect("pets.db")
+    # create a cursor to the pets db
+    cursor = conn.cursor()
+    # create tables if they don't exist
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS person (
+            id INTEGER PRIMARY KEY,
+            first_name TEXT,
+            last_name TEXT,
+            age INTEGER
+        );
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS pet (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            breed TEXT,
+            age INTEGER,
+            dead INTEGER
+        );
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS person_pet (
+            person_id INTEGER,
+            pet_id INTEGER
+        );
+        """
+    )
+    # commit the changes to db
+    conn.commit()
+    # close the connection
+    conn.close()
+
+
+def load_data():
+    # Create the database and the tables
+    create_pets_db()
+
+    # create a list of tuples for table person
+    person = [
+        (1, "James", "Smith", 41),
+        (2, "Diana", "Greene", 23),
+        (3, "Sara", "White", 27),
+        (4, "William", "Gibson", 23),
+    ]
+    # create a list of tuples for table pet
+    pet = [
+        (1, "Rusty", "Dalmation", 4, 1),
+        (2, "Bella", "Alaskan Malamute", 3, 0),
+        (3, "Max", "Cocker Spaniel", 1, 0),
+        (4, "Rocky", "Beagle", 7, 0),
+        (5, "Rufus", "Cocker Spaniel", 1, 0),
+        (6, "Spot", "Bloodhound", 2, 1),
+    ]
+    # create a list of tuples for table person_pet
+    person_pet = [(1, 1), (1, 2), (2, 3), (2, 4), (3, 5), (4, 6)]
+
+    # connect to database
+    conn = sqlite3.connect("pets.db")
+    # create a cursor to the pets db
+    cursor = conn.cursor()
+    # insert the data defined in the list of tuples above
+    cursor.executemany("INSERT INTO Person VALUES (?, ?, ?, ?)", person)
+    cursor.executemany("INSERT INTO Pet VALUES (?, ?, ?, ?, ?)", pet)
+    cursor.executemany("INSERT INTO Person_Pet VALUES (?, ?)", person_pet)
+    # commit changes
+    conn.commit()
+    # close the connection
+    conn.close()
+
 
 if __name__ == "__main__":
-    pass
+    load_data()
